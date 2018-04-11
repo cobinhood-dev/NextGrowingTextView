@@ -71,6 +71,12 @@ internal class NextGrowingInternalTextView: UITextView {
       didUpdateHeightDependencies()
     }
   }
+	
+	var placeholderInset: UIEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5) {
+		didSet {
+			didUpdateHeightDependencies()
+		}
+	}
 
   var placeholderAttributedText: NSAttributedString? {
     didSet {
@@ -92,9 +98,9 @@ internal class NextGrowingInternalTextView: UITextView {
     paragraphStyle.alignment = textAlignment
 
     let targetRect = CGRect(
-      x: 5 + textContainerInset.left,
+      x: placeholderInset.left + textContainerInset.left,
       y: textContainerInset.top,
-      width: frame.size.width - (textContainerInset.left + textContainerInset.right),
+      width: frame.size.width - (textContainerInset.left + textContainerInset.right) - (placeholderInset.left + placeholderInset.right),
       height: frame.size.height - (textContainerInset.top + textContainerInset.bottom)
     )
     
@@ -119,6 +125,6 @@ internal class NextGrowingInternalTextView: UITextView {
   }
 
   private func updatePlaceholder() {
-    displayPlaceholder = text.characters.count == 0
+    displayPlaceholder = text.count == 0
   }
 }

@@ -168,14 +168,33 @@ open class NextGrowingTextView: UIScrollView {
   }
 
   private func measureTextViewSize() -> CGSize {
-    return _textView.sizeThatFits(CGSize(width: self.bounds.width, height: CGFloat.infinity))
-  }
+		/// Calculate attributed placeholder's size if exists.
+		if let attributedPlaceholder = _textView.placeholderAttributedText, _textView.text.isEmpty {
+			/// Create target rect with text container inset and placeholder inset.
+			let targetSize = CGSize(
+				width: frame.size.width
+					- (_textView.textContainerInset.left + _textView.textContainerInset.right)
+					- (_textView.placeholderInset.left + _textView.placeholderInset.right),
+				height: CGFloat.greatestFiniteMagnitude
+			)
+			
+			var rect = attributedPlaceholder.boundingRect(with: targetSize,
+																										options: [.usesFontLeading, .usesLineFragmentOrigin],
+																										context: nil).size
+			
+			/// Rect height should contains text container inset and placeholder inset.
+			rect.height += (_textView.textContainerInset.top + _textView.textContainerInset.bottom) + (_textView.placeholderInset.top + _textView.placeholderInset.bottom)
+			return rect
+		}
+		
+		return _textView.sizeThatFits(CGSize(width: self.bounds.width, height: CGFloat.infinity))
+	}
 
   private func measureFrame(_ contentSize: CGSize) -> CGRect {
 
     let selfSize: CGSize
 
-    if contentSize.height < _minHeight || !_textView.hasText {
+    if contentSize.height < _minHeight {
       selfSize = CGSize(width: contentSize.width, height: _minHeight)
     } else if _maxHeight > 0 && contentSize.height > _maxHeight {
       selfSize = CGSize(width: contentSize.width, height: _maxHeight)
